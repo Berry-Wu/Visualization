@@ -12,16 +12,19 @@ from separate_num import separate
 
 def vis_filter(model_weights, layer):
     print('p====================卷积核可视化====================q')
-    plt.figure(figsize=(5, 5))
     filter_num = model_weights[layer].shape[0]
-    print(f'该层一共有[{filter_num}]个卷积核')
+    filter_channel = model_weights[layer].shape[1]
+    print(model_weights[layer].shape)
+    print(f'该层一共有[{filter_num}]个卷积核,每个卷积核的维度为[{filter_channel}]')
     row, column = separate(filter_num)
-    for i, filter in enumerate(model_weights[layer]):
-        plt.subplot(row, column, i + 1)
-        plt.imshow(filter[0, :, :].detach(), cmap='gray')
-        plt.axis('off')
-        plt.savefig(f'./imgs_out/filter_{layer + 1}.png')
-    plt.show()
+    for j in range(filter_channel):
+        plt.figure(figsize=(5, 5))
+        for i, filter in enumerate(model_weights[layer]):
+            plt.subplot(row, column, i + 1)
+            plt.imshow(filter[j, :, :].detach(), cmap='gray')
+            plt.axis('off')
+        plt.savefig(f'./imgs_out/filter_layer{layer + 1}_channel{j}.png')
+        plt.show()
     print('b==================卷积核可视化结束===================d')
 
 
