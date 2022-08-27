@@ -98,6 +98,7 @@ def vis_grid_attention(img_path, attention_map, cmap='jet'):
     # 保存图像,以300dpi
     img_name = img_path.split('/')[-1].split('.')[0] + "_with_attention.jpg"
     plt.savefig(f'./imgs_out/{img_name}', dpi=300)
+    print(f'[{img_name}] is generated')
     # plt.show()
 
 
