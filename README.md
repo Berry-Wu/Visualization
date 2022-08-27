@@ -7,14 +7,27 @@
 **效果示例**
 > 这里使用resnet50预训练模型
 
-- 卷积核：
+- 注意力可视化(8.27新增)
+  
+  > 见visual.py 中 vis_grid_attention函数
+  - 原图:
+  ![](imgs_in/dog_1.jpg)
+  - 注意力可视化后:
+  ![](imgs_out/dog_1_with_attention.jpg)
+  - 注:这里的attention_map并非来自真实得到,是定义的一个二维数组
+  ```python
+    attention_map = np.zeros((20, 20))
+    attention_map[9][9] = 1
+    attention_map[10][12] = 1
+  ```
+- 卷积核可视化：
     
   - filter3
   ![](imgs_out/filter_3.png)
   - filter48
   ![](imgs_out/filter_48.png)
   
-- 特征图：
+- 特征图可视化：
 
   - layer0
   ![](imgs_out/layer_0.png)
