@@ -6,10 +6,12 @@
 # ---------------------------------------
 import cv2
 import numpy as np
+import torch
 from matplotlib import pyplot as plt
 from data import data_load
 from separate_num import separate
 import matplotlib
+import seaborn as sns
 
 matplotlib.use('Agg')  # 加上这句话plt.show就会报错。作用是控制绘图不显示
 
@@ -40,7 +42,7 @@ def vis_filter(model_weights, layer):
 def vis_image(image):
     h, w = image.shape[0], image.shape[1]
     plt.subplots(figsize=(w * 0.01, h * 0.01))
-    plt.imshow(image)
+    plt.imshow(image, alpha=1)
     # plt.axis('off')
     # plt.show()
     return h, w
@@ -74,6 +76,24 @@ def vis_feature(features, num_layers):
     print('b==================特征图可视化结束===================d')
 
 
+def vis_attention_matrix(attention_map, index=0, cmap="YlGnBu"):
+    """
+    :param attention_map: 注意力得分矩阵
+    :param index: map编号,便于多个注意力可视化的存储
+    :param cmap: 颜色样式
+    :return:
+    """
+    plt.figure(figsize=(6, 5))
+    sns.heatmap(
+                attention_map,
+                vmin=0.0, vmax=1.0,
+                cmap=cmap,
+                # annot=True,  # 每个格子上显示数据
+                square=True)
+    plt.savefig(f'./imgs_out/attention_matrix_{index}.png')
+    print(f'[attention_matrix_{index}.png] is generated')
+
+
 def vis_grid_attention(img_path, attention_map, cmap='jet'):
     """
     :param img_path:图像路径
@@ -89,7 +109,7 @@ def vis_grid_attention(img_path, attention_map, cmap='jet'):
     map = cv2.resize(attention_map, (w, h))
     normed_map = map / map.max()
     normed_map = (normed_map * 255).astype('uint8')
-    plt.imshow(normed_map, alpha=0.5, interpolation='nearest', cmap=cmap)
+    plt.imshow(normed_map, alpha=0.4, interpolation='nearest', cmap=cmap)  # alpha值决定图像的透明度,0为透明,1不透明
 
     # 去掉图片周边白边
     plt.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)  # 调整图像与画布的边距(此时填充满)
@@ -98,6 +118,7 @@ def vis_grid_attention(img_path, attention_map, cmap='jet'):
     # 保存图像,以300dpi
     img_name = img_path.split('/')[-1].split('.')[0] + "_with_attention.jpg"
     plt.savefig(f'./imgs_out/{img_name}', dpi=300)
+    print(f'[{img_name}] is generated')
     # plt.show()
 
 
@@ -105,5 +126,7 @@ if __name__ == '__main__':
     attention_map = np.zeros((20, 20))
     attention_map[9][9] = 1
     attention_map[10][12] = 1
-
     vis_grid_attention(img_path="./imgs_in/dog_1.jpg", attention_map=attention_map)
+
+    attention_map = np.random.normal(size=(10,10))
+    vis_attention_matrix(attention_map)
