@@ -11,8 +11,10 @@
   
   > 见visual.py 中 vis_grid_attention函数
   - 原图:
+  
   ![](imgs_in/dog_1.jpg)
   - 注意力可视化后:
+  
   ![](imgs_out/dog_1_with_attention.jpg)
   - 注:这里的attention_map并非来自真实得到,是定义的一个二维数组
   ```python
