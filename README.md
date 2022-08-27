@@ -25,14 +25,18 @@
 - 卷积核可视化：
     
   - filter3
+ 
   ![](imgs_out/filter_3.png)
   - filter48
+ 
   ![](imgs_out/filter_48.png)
   
 - 特征图可视化：
 
   - layer0
+ 
   ![](imgs_out/layer_0.png)
   - layer4
+
   ![](imgs_out/layer_4.png)
   
