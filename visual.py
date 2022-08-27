@@ -5,12 +5,21 @@
 # @File : visual.py
 # ---------------------------------------
 import cv2
+import numpy as np
 from matplotlib import pyplot as plt
-
+from data import data_load
 from separate_num import separate
+import matplotlib
+
+matplotlib.use('Agg')  # 加上这句话plt.show就会报错。作用是控制绘图不显示
 
 
 def vis_filter(model_weights, layer):
+    """
+    :param model_weights: 传入整个模型的权重
+    :param layer: 选择可视化哪一层
+    :return:
+    """
     print('p====================卷积核可视化====================q')
     filter_num = model_weights[layer].shape[0]
     filter_channel = model_weights[layer].shape[1]
@@ -29,12 +38,20 @@ def vis_filter(model_weights, layer):
 
 
 def vis_image(image):
-    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    plt.imshow(img)
-    plt.show()
+    h, w = image.shape[0], image.shape[1]
+    plt.subplots(figsize=(w * 0.01, h * 0.01))
+    plt.imshow(image)
+    # plt.axis('off')
+    # plt.show()
+    return h, w
 
 
 def vis_feature(features, num_layers):
+    """
+    :param features: 特征图(即图像经过卷积后的样子)
+    :param num_layers:所有的特征图层数
+    :return:
+    """
     print('p====================特征图可视化====================q')
     for num_layer in range(len(features)):
         plt.figure(figsize=(5, 5))  # 5*5有点小了，建议改大
@@ -55,3 +72,38 @@ def vis_feature(features, num_layers):
         plt.savefig(f'./imgs_out/layer_{num_layer}.png')
         plt.close()
     print('b==================特征图可视化结束===================d')
+
+
+def vis_grid_attention(img_path, attention_map, cmap='jet'):
+    """
+    :param img_path:图像路径
+    :param attention_map:注意力图
+    :param cmap: cmap是图像的颜色类型，有很多预设的颜色类型
+    :return:
+    """
+    # draw the img
+    img = data_load(img_path)
+    h, w = vis_image(img)
+
+    # draw the attention
+    map = cv2.resize(attention_map, (w, h))
+    normed_map = map / map.max()
+    normed_map = (normed_map * 255).astype('uint8')
+    plt.imshow(normed_map, alpha=0.5, interpolation='nearest', cmap=cmap)
+
+    # 去掉图片周边白边
+    plt.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)  # 调整图像与画布的边距(此时填充满)
+    plt.margins(0, 0)
+
+    # 保存图像,以300dpi
+    img_name = img_path.split('/')[-1].split('.')[0] + "_with_attention.jpg"
+    plt.savefig(f'./imgs_out/{img_name}', dpi=300)
+    # plt.show()
+
+
+if __name__ == '__main__':
+    attention_map = np.zeros((20, 20))
+    attention_map[9][9] = 1
+    attention_map[10][12] = 1
+
+    vis_grid_attention(img_path="./imgs_in/dog_1.jpg", attention_map=attention_map)

@@ -17,6 +17,7 @@ transform = transforms.Compose([
 
 def data_load(img_path):
     img = cv2.imread(img_path)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     return img
 
 
@@ -30,7 +31,7 @@ def data_process(img):
 
 
 def data_to_model(conv_layers, img):
-    # 将图片经过网络的所有层
+    # 将图片经过网络的所有卷积层
     output = [conv_layers[0](img)]
     for i in range(1, len(conv_layers)):
         output.append(conv_layers[i](output[-1]))

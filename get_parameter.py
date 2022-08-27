@@ -8,6 +8,10 @@ from torch import nn
 
 
 def model_param(model):
+    """
+    :param model:
+    :return: model_weights:模型权重;conv_layers:存储所有的卷积层;counter:卷积层个数
+    """
     model_weights = []  # save the conv layer weights
     conv_layers = []  # save the conv layers
     counter = 0  # counter: keep count of the conv layers
