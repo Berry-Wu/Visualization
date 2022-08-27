@@ -22,23 +22,19 @@
     attention_map[9][9] = 1
     attention_map[10][12] = 1
   ```
-- 注意力矩阵热图:
-   > 这里随机产生正态分布的二维矩阵
-  
-  ![](imgs_out/attention_matrix_0.png)
 - 卷积核可视化：
     
   - filter3
-  
+ 
   ![](imgs_out/filter_3.png)
   - filter48
-  
+ 
   ![](imgs_out/filter_48.png)
   
 - 特征图可视化：
 
   - layer0
-
+ 
   ![](imgs_out/layer_0.png)
   - layer4
 
