@@ -4,14 +4,18 @@
 # @Author : wzy 
 # @File : visual.py
 # ---------------------------------------
+import math
+
 import cv2
 import numpy as np
 import torch
 from matplotlib import pyplot as plt
-from data import data_load
+from data import data_load, transform, data_to_tensor
 from separate_num import separate
 import matplotlib
 import seaborn as sns
+from einops import rearrange
+from img_patch import patchify, masking
 
 matplotlib.use('Agg')  # 加上这句话plt.show就会报错。作用是控制绘图不显示
 
@@ -85,11 +89,11 @@ def vis_attention_matrix(attention_map, index=0, cmap="YlGnBu"):
     """
     plt.figure(figsize=(6, 5))
     sns.heatmap(
-                attention_map,
-                vmin=0.0, vmax=1.0,
-                cmap=cmap,
-                # annot=True,  # 每个格子上显示数据
-                square=True)
+        attention_map,
+        vmin=0.0, vmax=1.0,
+        cmap=cmap,
+        # annot=True,  # 每个格子上显示数据
+        square=True)
     plt.savefig(f'./imgs_out/attention_matrix_{index}.png')
     print(f'[attention_matrix_{index}.png] is generated')
 
@@ -122,11 +126,50 @@ def vis_grid_attention(img_path, attention_map, cmap='jet'):
     # plt.show()
 
 
+def vis_img_patch(patch_tensor, patch_size, mask=None):
+    """
+    将图片划分成patch块并显示
+    :param patch_tensor: (B,NUM,patch_size^2*C) 其中NUM是patch块的数量
+    :param patch_size: patch的边长(默认正方形)
+    :param mask:masking函数得到的mask矩阵，代表哪些patch被mask
+    :return:
+    """
+    if mask is not None:
+        mask = mask.detach()
+        mask = mask.unsqueeze(-1).repeat(1, 1, 16 ** 2 * 3)  # (N, H*W, p*p*3)
+        patch_tensor = patch_tensor * (1 - mask)
+    print(patch_tensor.shape)
+    patch_tensor = patch_tensor.squeeze(0)
+    n, d = patch_tensor.shape
+    h = w = int(math.sqrt(n))
+    # divide the img from (NUM_patch,D)->(NUM_patch,H_patch,W_patch,C) C放在后面便于plt处理
+    img = rearrange(patch_tensor, 'n (n1 n2 c) -> n n1 n2 c', n1=patch_size, n2=patch_size)
+
+    plt.figure(figsize=(5, 5))
+    for i in range(h * w):
+        plt.subplot(h, w, i + 1)
+        plt.imshow(img[i].data.numpy(), cmap='gray')
+        plt.axis('off')
+    if mask is None:
+        plt.savefig(f'./imgs_out/img_patch.png')
+    else:
+        plt.savefig(f'./imgs_out/masked_patch.png')
+
+
 if __name__ == '__main__':
     attention_map = np.zeros((20, 20))
     attention_map[9][9] = 1
     attention_map[10][12] = 1
     vis_grid_attention(img_path="./imgs_in/dog_1.jpg", attention_map=attention_map)
 
-    attention_map = np.random.normal(size=(10,10))
+    attention_map = np.random.normal(size=(10, 10))
     vis_attention_matrix(attention_map)
+
+    # 进行patch划分及可视化
+    img = data_to_tensor(img_path="./imgs_in/dog_1.jpg")
+    img = patchify(img, patch_size=16)
+    vis_img_patch(img, patch_size=16)
+
+    # 进行mask及可视化
+    x, mask, ids_restore = masking(img, 0.75)
+    vis_img_patch(img, patch_size=16, mask=mask)

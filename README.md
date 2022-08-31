@@ -5,7 +5,18 @@
 3. 调用visual.py中的卷积核可视化及特征图可视化
 
 **效果示例**
-> 这里使用resnet50预训练模型
+> 部分实验使用resnet50预训练模型
+
+- img_patch以及patch_mask实现及可视化(8.31新增)
+  > 新增img_patch.py,且得到的结果支持输入encoder
+  
+  **将图像划分为patch块：**
+  
+  ![](imgs_out/img_patch.png)
+  
+  **随机mask，mask_ratio=0.75:**
+  
+  ![](imgs_out/masked_patch.png)
 
 - 注意力可视化(8.27新增)
   
@@ -22,19 +33,23 @@
     attention_map[9][9] = 1
     attention_map[10][12] = 1
   ```
+- 注意力矩阵热图:
+   > 这里随机产生正态分布的二维矩阵
+  
+  ![](imgs_out/attention_matrix_0.png)
 - 卷积核可视化：
     
   - filter3
- 
+  
   ![](imgs_out/filter_3.png)
   - filter48
- 
+  
   ![](imgs_out/filter_48.png)
   
 - 特征图可视化：
 
   - layer0
- 
+
   ![](imgs_out/layer_0.png)
   - layer4
 

@@ -8,9 +8,10 @@ import cv2
 import numpy as np
 from torchvision.transforms import transforms
 
+
 transform = transforms.Compose([
     transforms.ToPILImage(),
-    transforms.Resize((512, 512)),
+    transforms.Resize((224, 224)),
     transforms.ToTensor(),
 ])
 
@@ -36,3 +37,9 @@ def data_to_model(conv_layers, img):
     for i in range(1, len(conv_layers)):
         output.append(conv_layers[i](output[-1]))
     return output
+
+
+def data_to_tensor(img_path):
+    img = data_load(img_path)
+    img = transform(img)
+    return img.unsqueeze(0)
