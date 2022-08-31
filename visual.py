@@ -142,14 +142,21 @@ def vis_img_patch(patch_tensor, patch_size, mask=None):
     patch_tensor = patch_tensor.squeeze(0)
     n, d = patch_tensor.shape
     h = w = int(math.sqrt(n))
-    # divide the img from (NUM_patch,D)->(NUM_patch,H_patch,W_patch,C) C放在后面便于plt处理
-    img = rearrange(patch_tensor, 'n (n1 n2 c) -> n n1 n2 c', n1=patch_size, n2=patch_size)
-
     plt.figure(figsize=(5, 5))
-    for i in range(h * w):
-        plt.subplot(h, w, i + 1)
-        plt.imshow(img[i].data.numpy(), cmap='gray')
-        plt.axis('off')
+
+    # way-1 单个patch分离明显(建议查看patch效果时使用)
+    # divide the img from (NUM_patch,D)->(NUM_patch,H_patch,W_patch,C) C放在后面便于plt处理
+    # img = rearrange(patch_tensor, 'n (n1 n2 c) -> n n1 n2 c', n1=patch_size, n2=patch_size)
+    # for i in range(h * w):
+    #     plt.subplot(h, w, i + 1)
+    #     plt.imshow(img[i].data.numpy(), cmap='gray')
+    #     plt.axis('off')
+
+    # way-2 patch紧密相连(建议查看mask效果时使用)
+    img = rearrange(patch_tensor, '(h w) (n1 n2 c) -> (h n1) (w n2) c', h=h, w=w, n1=patch_size, n2=patch_size)
+    plt.imshow(img)
+    plt.axis('off')
+
     if mask is None:
         plt.savefig(f'./imgs_out/img_patch.png')
     else:
