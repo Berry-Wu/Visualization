@@ -53,6 +53,8 @@
   
 ## 5、img_patch以及patch_mask实现及可视化(8.31新增)
 > 新增img_patch.py,且得到的结果支持输入encoder
+
+> 参考MAE官方实现，论文也很好看arXiv:2111.06377
   
   **将图像划分为patch块：**
   
