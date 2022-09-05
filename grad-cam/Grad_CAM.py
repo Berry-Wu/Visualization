@@ -22,7 +22,7 @@ class GradCAM:
 
     def get_cam_weights(self, grads):
         """
-        :param grads: yc对特征图A反向传播计算的梯度
+        :param grads: yc对特征图A反向传播计算的梯度  (B C H W)
         :return: 原文第一个公式，也就是将梯度对高和宽求平均，从而得到某个通道的重要性权重
         """
         # 本来应该是2，3维，到这里少了batchsize，还在debug--> 见本py的L149-L154
@@ -35,9 +35,10 @@ class GradCAM:
         :param grads: yc对特征图A反向传播计算的梯度
         :return:
         """
-        weights = self.get_cam_weights(grads)
-        print(weights.shape, activations.shape)
-        weighted_activations = weights * activations
+        # weight就是通道的重要性权重，是一个形状为1*channels的向量
+        weights = self.get_cam_weights(grads)  # weights:(1, 512, 1, 1)  activations:(1, 512, 13, 20)
+        weighted_activations = weights * activations  # (1, 512, 13, 20)
+        print(weighted_activations.shape)
         cam = weighted_activations.sum(axis=1)
         return cam
 
@@ -71,7 +72,7 @@ class GradCAM:
         :param input_tensor:
         :return: cam_per_target_layer:是一个列表，里面存储了每个通道的cam
         """
-        # 得到该特征层的激活、反向传播梯度、特征图大小
+        # 得到该特征层的激活、反向传播梯度、特征图大小;目前list里只有一个元素，因为这里只取一层特征图
         activations_list = [a.cpu().data.numpy() for a in self.activations_and_grads.activations]
         grads_list = [g.cpu().data.numpy() for g in self.activations_and_grads.gradients]
         target_size = self.get_target_width_height(input_tensor)
@@ -144,6 +145,7 @@ class ActivationsAndGradients:
         self.activations = []
         self.reshape_transform = reshape_transform
         self.handles = []
+        # 模型的获取grad和activation
         for target_layer in target_layers:
             self.handles.append(target_layer.register_forward_hook(self.save_activation))
 
@@ -154,13 +156,13 @@ class ActivationsAndGradients:
             else:
                 self.handles.append(target_layer.register_backward_hook(self.save_gradient))
 
-    def save_activation(self, module, input, output):  # 应该是register那个函数默认的，需要输入这几个参数；删掉就报错
+    def save_activation(self, module, input, output):  # 是register那个函数默认的，需要输入这几个参数；删掉就报错
         activation = output
         if self.reshape_transform is not None:
             activation = self.reshape_transform(activation)
         self.activations.append(activation.cpu().detach())
 
-    def save_gradient(self, module, input, output):  # 目前有疑惑，module和input没用，但不写会报错
+    def save_gradient(self, module, input, output):
         grad = output[0]
         # Gradients are computed in reverse order
         if self.reshape_transform is not None:
