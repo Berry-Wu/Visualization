@@ -1,6 +1,9 @@
 # Amazing Visualization
 > 本项目实现一些有意思且有用的可视化，部分代码有所参考，且均在代码中标注出
 
+## 0、更新日志
+- 10.18日新增人体关键点热图可视化
+
 ## 1、卷积核可视化：
 > 参考链接：https://debuggercafe.com/visualizing-filters-and-feature-maps-in-convolutional-neural-networks-using-pytorch/
 > 
@@ -77,3 +80,14 @@
 使用预训练模型resnet50
 
 ![](imgs_out/grad-cam.png)
+
+## 7、人体姿态估计heatmap可视化(10,18新增)
+> 见gen_heatmap.py
+> 使用mpii数据集，参考张院士代码
+> 代码中的pt是从模型输出中保存的，使用`torch.save(xx_tensor, 'xx.pt')`
+
+**效果图：**
+
+![](imgs_out/all_in_one_11.jpg)
+
+![](imgs_out/all_in_one_22.jpg)
