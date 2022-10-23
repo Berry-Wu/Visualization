@@ -24,10 +24,10 @@ class GuidedBackpropReLU(Function):
 
     @staticmethod
     def backward(self, grad_output):
-        # saved_tensor函数可以获得save_for_backward函数存储的数据
-        input_img, output = self.saved_tensors  # torch.Size([1, 2048, 7, 7]) torch.Size([1, 2048, 7, 7])
-        positive_mask_1 = (input_img > 0).type_as(grad_output)  # torch.Size([1, 2048, 7, 7])  输入的特征大于零
-        positive_mask_2 = (grad_output > 0).type_as(grad_output)  # torch.Size([1, 2048, 7, 7])  梯度大于零
+        # saved_tensor函数可以获得上面save_for_backward函数存储的数据
+        input_img, output = self.saved_tensors  # 
+        positive_mask_1 = (input_img > 0).type_as(grad_output)  #  输入的特征大于零
+        positive_mask_2 = (grad_output > 0).type_as(grad_output)  # 梯度大于零
         grad_input = grad_output * positive_mask_1 * positive_mask_2  
         return grad_input
 
@@ -70,9 +70,9 @@ class GuidedBackpropReLUModel:
         loss = output[0, target_category]
         loss.backward(retain_graph=True)
 
-        output = input_img.grad.cpu().data.numpy()  # (1, 3, 224, 224)
+        output = input_img.grad.cpu().data.numpy()  # (1, 3, H, W)
         output = output[0, :, :, :]  # (3, 224, 224)
-        output = output.transpose((1, 2, 0))  # 变成(224, 224, 3)便于图片打印
+        output = output.transpose((1, 2, 0))  # 变成(H, W, 3)便于图片打印
 
         replace_all_layer_type_recursive(self.model,
                                          GuidedBackpropReLUasModule,
@@ -103,13 +103,15 @@ def deprocess_image(img):
     img = img / (np.std(img) + 1e-5)
     img = img * 0.1
     img = img + 0.5
-    img = np.clip(img, 0, 1)
+    img = np.clip(img, 0, 1)  # 限制值在0-1内
     return np.uint8(img*255)
 
 if __name__ == '__main__':
     img_path = 'wzy/Visualization/grad-cam/d_c.jpg'
     img = cv2.imread(img_path)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) # BGR格式转换为RGB格式 shape: (224, 224, 3) 即(H, W, RGB)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) # BGR格式转换为RGB格式即(H, W, RGB)
+
+    # 因为cv2得到的数据是uint8，需要转换为float32
     img = np.float32(img) / 255  # 转为float32类型,范围[0,1]
 
     input_img = preprocess_image(img)  # torch.Size([1, 3, H, W])
