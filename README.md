@@ -3,6 +3,7 @@
 
 ## 0、更新日志
 - 10.18日新增人体关键点热图可视化
+- 10.23日新增guided-backpropagation可视化
 
 ## 1、卷积核可视化：
 > 参考链接：https://debuggercafe.com/visualizing-filters-and-feature-maps-in-convolutional-neural-networks-using-pytorch/
@@ -91,3 +92,11 @@
 ![](imgs_out/all_in_one_11.jpg)
 
 ![](imgs_out/all_in_one_22.jpg)
+
+## 8、Guided_Backpropagation
+> 见grad-cam文件夹下guided_backpro.py
+
+**效果图**
+![](grad-cam/gb.jpg)
+
+![](grad-cam/gb_dc.jpg)
