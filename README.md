@@ -1,4 +1,5 @@
 # Amazing Visualization
+[![Security Status](https://s.murphysec.com/badge/Berry-Wu/Visualization.svg)](https://www.murphysec.com/p/Berry-Wu/Visualization)
 > 本项目实现一些有意思且有用的可视化，部分代码有所参考，且均在代码中标注出
 
 ## 0、更新日志
